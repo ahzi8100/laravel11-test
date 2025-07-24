@@ -1,0 +1,149 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Blog;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class BlogController extends Controller
+{
+    public function index(Request $request)
+    {
+        $title = $request->title;
+        // Query Builder
+        // $blogs = DB::table('blogs')->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at')->paginate(10);
+
+        // Eloquent ORM
+        // $blogs = Blog::all();
+        $blogs = Blog::where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at')->paginate(10);
+        return view('blog', ['blogs' => $blogs, 'title' => $title]);
+    }
+
+    public function create()
+    {
+        return view('blogs/create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|unique:blogs|max:20',
+            'description' => 'required',
+            'status' => 'required',
+        ]);
+
+        if ($validated) {
+            // Query Builder
+            // DB::table('blogs')->insert([
+            //     'title' => $request->title,
+            //     'description' => $request->description,
+            //     'status' => $request->status,
+            //     'user_id' => fake()->numberBetween(1, User::all()->count()),
+            //     'created_at' => now()
+            // ]);
+
+            // Eloquent ORM
+            Blog::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => $request->status,
+                'user_id' => fake()->numberBetween(1, User::all()->count()),
+            ]);
+        }
+
+        return redirect()->route('blogs.index')->with('success', 'New Blog Added Succesfully!');
+    }
+
+    public function show($id)
+    {
+        // Query Builder
+        // $blog = DB::table('blogs')->where('id', $id)->first();
+
+        // Eloquent ORM
+        // $blog = Blog::where('id', $id)->first();
+        // $blog = Blog::find($id);
+        $blog = Blog::findOrFail($id);
+        // if (!$blog) {
+        //     abort(404);
+        // }
+        return view('blogs/detail', ['blog' => $blog]);
+    }
+
+    public function edit($id)
+    {
+        // Query Builder
+        // $blog = DB::table('blogs')->where('id', $id)->first();
+        // if (!$blog) {
+        //     abort(404);
+        // }
+        $blog = Blog::findOrFail($id);
+        return view('blogs/edit', ['blog' => $blog]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:255|unique:blogs,title,' . $id,
+            'description' => 'required',
+            'status' => 'required'
+        ]);
+
+        if ($validated) {
+            // Query Builder
+            // DB::table('blogs')->where('id', $id)->update([
+            //     'title' => $request->title,
+            //     'description' => $request->description,
+            //     'status' => $request->status,
+            //     'user_id' => fake()->numberBetween(1, User::all()->count()),
+            //     'updated_at' => now()
+            // ]);
+
+            // Eloquent ORM
+            $blog = Blog::findOrFail($id);
+            $blog->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => $request->status,
+                'user_id' => fake()->numberBetween(1, User::all()->count()),
+            ]);
+        }
+
+        return redirect()->route('blogs.index')->with('success', 'Blog Edited Succesfully!');
+    }
+
+    public function delete($id)
+    {
+        // Query Builder
+        // $blog = DB::table('blogs')->where('id', $id)->delete();
+
+        // Eloquent ORM
+        // $blog = Blog::findOrFail($id)->delete();
+        $blog = Blog::destroy($id);
+
+        if (!$blog) {
+            return redirect()->route('blogs.index')->with('failed', 'Blog Failed to Delete!');
+        }
+
+        return redirect()->route('blogs.index')->with('success', 'Blog Deleted Succesfully!');
+    }
+
+    public function trash()
+    {
+        $blogs = Blog::onlyTrashed()->get();
+        return view('blogs/restore', ['blogs' => $blogs]);
+    }
+
+    public function restore($id)
+    {
+        $blog = Blog::onlyTrashed()->findOrFail($id)->restore();
+
+        if (!$blog) {
+            return redirect()->route('blogs.index')->with('failed', 'Data Blog Failed to Restore!');
+        }
+
+        return redirect()->route('blogs.index')->with('success', 'Data Blog Restore Succesfully!');
+    }
+}
