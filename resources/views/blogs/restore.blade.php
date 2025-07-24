@@ -30,7 +30,7 @@
         <!-- Buttons -->
         <a href="{{ route('blogs.index') }}"
             class="mt-10 bg-gray-100 text-sm text-gray-600 hover:underline px-4 py-2 rounded border border-gray-400 hover:bg-gray-400 hover:text-white">
-            Back
+            Kembali
         </a>
     </div>
 </body>
