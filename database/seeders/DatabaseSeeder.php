@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Blog;
+use App\Models\Phone;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,8 +22,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        User::factory(50)->create();
-        Blog::factory(100)->create();
+        // User::factory(50)->create();
+        // Blog::factory(100)->create();
+        Phone::truncate();
+        Phone::factory(20)->create();
+
 
         // $this->call([
         //     UserSeeder::class,

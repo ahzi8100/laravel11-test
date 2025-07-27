@@ -3,13 +3,17 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+// Admin
+Route::get('/admin/blogs', [BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
 Route::post('/blogs/store', [BlogController::class, 'store'])->name('blogs.store');
 Route::get('/blogs/{id}/detail', [BlogController::class, 'show'])->name('blogs.show');
@@ -18,6 +22,16 @@ Route::patch('/blogs/{id}/update', [BlogController::class, 'update'])->name('blo
 Route::get('/blogs/{id}/delete', [BlogController::class, 'delete'])->name('blogs.delete');
 Route::get('/blogs/trash', [BlogController::class, 'trash'])->name('blogs.trash');
 Route::get('/blogs/{id}/restore', [BlogController::class, 'restore'])->name('blogs.restore');
+
+Route::get('/blogs', [BlogController::class, 'homepage'])->name('blogs.homepage');
+Route::get('/blogs/{id}', [BlogController::class, 'detail'])->name('blogs.detail');
+
+Route::post('/comment/{blog}', [CommentController::class, 'store'])->name('comment.store');
+Route::get('/comment', [CommentController::class, 'index'])->name('comment.index');
+Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/phones', [PhoneController::class, 'index'])->name('phones.index');
 
 // Route::get('/hello', function () {
 //     return 'Halo dari Laravel 11!';

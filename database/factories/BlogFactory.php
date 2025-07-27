@@ -17,11 +17,12 @@ class BlogFactory extends Factory
      */
     public function definition(): array
     {
+
         return [
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
             'status' => fake()->randomElement(['Active', 'Inactive']),
-            'user_id' => fake()->numberBetween(1, User::all()->count())
+            'user_id' => fake()->numberBetween(User::pluck())
         ];
     }
 }

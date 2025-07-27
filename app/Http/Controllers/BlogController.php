@@ -146,4 +146,16 @@ class BlogController extends Controller
 
         return redirect()->route('blogs.index')->with('success', 'Data Blog Restore Succesfully!');
     }
+
+    public function homepage()
+    {
+        $blogs = Blog::with('user')->where('status', 'Active')->orderBy('created_at', 'desc')->get();
+        return view('blogs.index', ['blogs' => $blogs]);
+    }
+
+    public function detail($id)
+    {
+        $blog = Blog::with(['user', 'comments'])->findOrFail($id);
+        return view('blogs.show', ['blog' => $blog]);
+    }
 }
