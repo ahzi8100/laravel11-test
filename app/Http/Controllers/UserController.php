@@ -12,4 +12,12 @@ class UserController extends Controller
         $users = User::with('phone')->paginate(10);
         return view('users.index', ['users' => $users]);
     }
+
+    public function comments()
+    {
+        $user = User::with('comments')->find(18);
+        foreach ($user->comments as $comment) {
+            echo $comment->comment_text . '<br>' ?? 'belum ada comment';
+        }
+    }
 }

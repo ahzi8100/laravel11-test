@@ -56,4 +56,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Blog::class);
     }
+
+    public function comments()
+    {
+        return $this->hasManyThrough(
+            Comment::class,
+            Blog::class,
+            'user_id',     // foreign key Blog → user_id
+            'blog_id',     // foreign key Comment → blog_id
+            'id',          // local key User
+            'id'           // local key Blog
+        );
+    }
 }

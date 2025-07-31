@@ -25,6 +25,13 @@
                 {{ $blog->created_at->diffForHumans() }}
             </span>
         </p>
+        <p class="text-sm text-gray-500 mb-4">Tag:
+            @foreach ($blog->tags as $tag)
+                <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 mr-1">
+                    {{ $tag->name }}
+                </span>
+            @endforeach
+        </p>
 
         <div class="text-gray-700 leading-relaxed mb-8">
             {{ $blog->description }}
