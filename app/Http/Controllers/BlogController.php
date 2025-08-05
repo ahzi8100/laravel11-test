@@ -19,7 +19,7 @@ class BlogController extends Controller
 
         // Eloquent ORM
         // $blogs = Blog::all();
-        $blogs = Blog::where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->paginate(10);
+        $blogs = Blog::with(['tags', 'comments'])->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->get();
         return view('blog', ['blogs' => $blogs, 'title' => $title]);
     }
 

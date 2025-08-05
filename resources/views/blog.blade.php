@@ -61,6 +61,8 @@
                     <tr>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">No</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Title</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-gray-900">Tags</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-gray-900">Comment</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Status</th>
                         <th scope="col" class="w-1/6 text-center font-medium text-gray-900">Action</th>
                     </tr>
@@ -76,9 +78,20 @@
                     @foreach ($blogs as $blog)
                         <tr>
                             <td class="px-6 py-4">
-                                {{ ($blogs->currentpage() - 1) * $blogs->perpage() + $loop->index + 1 }}
+                                {{-- {{ ($blogs->currentpage() - 1) * $blogs->perpage() + $loop->index + 1 }} --}}
+                                {{ $loop->index + 1 }}
                             </td>
                             <td class="px-6 py-4">{{ $blog->title }}</td>
+                            <td class="px-6 py-4">
+                                @foreach ($blog->tags as $tag)
+                                    {{ $tag->name }},
+                                @endforeach
+                            </td>
+                            <td class="px-6 py-4">
+                                @foreach ($blog->comments as $comment)
+                                    {{ $comment->comment_text }},
+                                @endforeach
+                            </td>
                             <td class="px-6 py-4">
                                 @if ($blog->status == 'Active')
                                     <span
@@ -104,7 +117,7 @@
                 </tbody>
             </table>
         </div>
-        {{ $blogs->links() }}
+        {{-- {{ $blogs->links() }} --}}
     </div>
 
     <script src="../path/to/flowbite/dist/flowbite.min.js"></script>

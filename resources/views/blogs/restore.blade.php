@@ -12,7 +12,6 @@
 <body class="bg-gray-100">
     <div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
         <h1 class="text-2xl font-semibold text-gray-700 mb-6">Trashed Blog</h1>
-
         <div class="mb-5">
             <label for="title" class="block text-sm font-medium text-gray-700 mb-5">Blog Title</label>
             @foreach ($blogs as $blog)
