@@ -61,6 +61,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">No</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Title</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-gray-900">Image</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Tags</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Comment</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Status</th>
@@ -82,6 +83,7 @@
                                 {{ $loop->index + 1 }}
                             </td>
                             <td class="px-6 py-4">{{ $blog->title }}</td>
+                            <td class="px-6 py-4">{{ $blog->image->name ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 @foreach ($blog->tags as $tag)
                                     {{ $tag->name }},

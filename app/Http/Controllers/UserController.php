@@ -9,7 +9,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('phone')->paginate(10);
+        $users = User::with(['phone', 'image'])->paginate(10);
         return view('users.index', ['users' => $users]);
     }
 

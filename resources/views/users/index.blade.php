@@ -22,6 +22,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">No</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Name</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-gray-900">Photo</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Email</th>
                         <th scope="col" class="px-6 py-4 font-medium text-gray-900">Phone</th>
                     </tr>
@@ -33,6 +34,7 @@
                                 {{ ($users->currentpage() - 1) * $users->perpage() + $loop->index + 1 }}
                             </td>
                             <td class="px-6 py-4">{{ $user->name }}</td>
+                            <td class="px-6 py-4">{{ $user->image->name ?? '-' }}</td>
                             <td class="px-6 py-4">{{ $user->email }}</td>
                             <td class="px-6 py-4">{{ $user->phone->phone_number ?? '-' }}</td>
                         </tr>
