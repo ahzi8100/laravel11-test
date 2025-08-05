@@ -19,7 +19,7 @@ class BlogController extends Controller
 
         // Eloquent ORM
         // $blogs = Blog::all();
-        $blogs = Blog::with(['tags', 'comments', 'image'])->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->get();
+        $blogs = Blog::with(['tags', 'comments', 'image', 'ratings'])->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->get();
         return view('blog', ['blogs' => $blogs, 'title' => $title]);
     }
 
@@ -163,7 +163,8 @@ class BlogController extends Controller
 
     public function detail($id)
     {
-        $blog = Blog::with(['user', 'comments', 'tags', 'image'])->findOrFail($id);
+        $blog = Blog::with(['user', 'comments', 'tags', 'image', 'ratings'])->findOrFail($id);
+        return $blog;
         return view('blogs.show', ['blog' => $blog]);
     }
 

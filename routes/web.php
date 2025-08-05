@@ -8,6 +8,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
@@ -40,6 +41,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
 
     Route::get('/images', [ImageController::class, 'index'])->name('images.index');
+    Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
 });
 
 
