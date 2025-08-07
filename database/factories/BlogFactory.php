@@ -19,8 +19,8 @@ class BlogFactory extends Factory
     {
 
         return [
-            'title' => fake()->sentence(),
-            'description' => fake()->paragraph(),
+            'title' => fake()->realText(10),
+            'description' => fake()->realText(),
             'status' => fake()->randomElement(['Active', 'Inactive']),
             'user_id' => fake()->numberBetween(User::pluck())
         ];

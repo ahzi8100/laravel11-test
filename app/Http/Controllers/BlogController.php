@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Blog;
 use App\Models\Tag;
+use App\Models\Blog;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class BlogController extends Controller
 {
@@ -19,7 +20,10 @@ class BlogController extends Controller
 
         // Eloquent ORM
         // $blogs = Blog::all();
-        $blogs = Blog::with(['tags', 'comments'])->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->get();
+        $user = Auth::user();
+        $blogs = Blog::with(['tags', 'comments'])->when($user->role !== 'admin', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->where('title', 'LIKE', '%' . $title . '%')->orderBy('created_at', 'desc')->get();
         return view('blog', ['blogs' => $blogs, 'title' => $title]);
     }
 
@@ -48,11 +52,12 @@ class BlogController extends Controller
             // ]);
 
             // Eloquent ORM
+            $auth = Auth::user();
             $blog = Blog::create([
                 'title' => $request->title,
                 'description' => $request->description,
                 'status' => $request->status,
-                'user_id' => fake()->numberBetween(1, User::all()->count()),
+                'user_id' => $auth->id,
             ]);
 
             $blog->tags()->attach($request->tags);
@@ -85,6 +90,11 @@ class BlogController extends Controller
         // }
         $tags = Tag::all();
         $blog = Blog::with('tags')->findOrFail($id);
+
+        // if (! Gate::allows('update-post', $blog)) {
+        //     return redirect()->route('blogs.index')->with('failed', 'Kamu bukan penulis blog ini, Tidak bisa edit blog punya orang lain');
+        // }
+
         return view('blogs/edit', ['blog' => $blog, 'tags' => $tags]);
     }
 
@@ -107,12 +117,20 @@ class BlogController extends Controller
             // ]);
 
             // Eloquent ORM
+            $auth = Auth::user();
             $blog = Blog::findOrFail($id);
+
+            Gate::authorize('update', $blog);
+
+            // if ($request->user()->cannot('update', $blog)) {
+            //     abort(403);
+            // }
+
             $blog->update([
                 'title' => $request->title,
                 'description' => $request->description,
                 'status' => $request->status,
-                'user_id' => fake()->numberBetween(1, User::all()->count()),
+                'user_id' => $auth->id,
             ]);
             // $blog->tags()->detach($blog->tags);
             // $blog->tags()->attach($request->tags);
@@ -122,7 +140,7 @@ class BlogController extends Controller
         return redirect()->route('blogs.index')->with('success', 'Blog Edited Succesfully!');
     }
 
-    public function delete($id)
+    public function delete(Request $request, $id)
     {
         // Query Builder
         // $blog = DB::table('blogs')->where('id', $id)->delete();
@@ -130,6 +148,11 @@ class BlogController extends Controller
         // Eloquent ORM
         // $blog = Blog::findOrFail($id)->delete();
         $blog = Blog::destroy($id);
+
+        // if ($request->user()->cannot('destroy', $blog)) {
+        //     abort(403);
+        // }
+        Gate::authorize('delete', $blog);
 
         if (!$blog) {
             return redirect()->route('blogs.index')->with('failed', 'Blog Failed to Delete!');

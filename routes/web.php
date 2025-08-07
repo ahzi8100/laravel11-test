@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
@@ -9,12 +10,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\CommentController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 // Admin
-Route::prefix('admin')->group(function () {
+Route::prefix('manage')->middleware('auth')->group(function () {
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
     Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
     Route::post('/blogs/store', [BlogController::class, 'store'])->name('blogs.store');
@@ -25,23 +26,32 @@ Route::prefix('admin')->group(function () {
     Route::get('/blogs/trash', [BlogController::class, 'trash'])->name('blogs.trash');
     Route::get('/blogs/{id}/restore', [BlogController::class, 'restore'])->name('blogs.restore');
 
-    Route::post('/comment/{blog}', [CommentController::class, 'store'])->name('comment.store');
-    Route::get('/comment', [CommentController::class, 'index'])->name('comment.index');
-    Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
-
     Route::get('/blogs/comment/latest', [BlogController::class, 'latest'])->name('blogs.comments.latest');
     Route::get('/blogs/phone', [BlogController::class, 'phone'])->name('blogs.phone');
-    Route::get('/users/comments', [UserController::class, 'comments']);
 
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/phones', [PhoneController::class, 'index'])->name('phones.index');
+    Route::middleware('admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/phones', [PhoneController::class, 'index'])->name('phones.index');
+        Route::post('/comment/{blog}', [CommentController::class, 'store'])->name('comment.store');
+        Route::get('/comment', [CommentController::class, 'index'])->name('comment.index');
+        Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+        Route::get('/users/comments', [UserController::class, 'comments']);
+        Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+    });
 
-    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
+});
 
-Route::get('/blogs', [BlogController::class, 'homepage'])->name('blogs.homepage');
+Route::get('/', [BlogController::class, 'homepage'])->name('blogs.homepage');
 Route::get('/blogs/{id}', [BlogController::class, 'detail'])->name('blogs.detail');
+
+
+
 
 
 // Route::get('/hello', function () {
