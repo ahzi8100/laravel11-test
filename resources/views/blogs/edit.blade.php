@@ -13,7 +13,7 @@
     <div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
         <h1 class="text-2xl font-semibold text-gray-700 mb-6">Edit Blog</h1>
 
-        <form action="{{ route('blogs.update', ['id' => $blog->id]) }}" method="POST" class="space-y-6">
+        <form action="{{ route('blogs.update', ['id' => $blog->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PATCH')
             <div>
@@ -50,6 +50,21 @@
                     <option value="Inactive" {{ $blog->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
                 @error('status')
+                    <div class="mt-2 p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                        role="alert">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="image">Upload
+                    Image</label>
+                <input
+                    class="@error('image') border-red-300 @enderror block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none dark:bg-gray-700"
+                    id="image" type="file" name="image">
+
+                @error('image')
                     <div class="mt-2 p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
                         role="alert">
                         {{ $message }}

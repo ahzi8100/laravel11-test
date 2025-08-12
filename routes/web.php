@@ -1,21 +1,27 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Models\User;
+use App\Mail\LoginMail;
 use Illuminate\Http\Request;
+use App\Jobs\ProcessLoginMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\CommentController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
 
 // Admin
-Route::prefix('manage')->middleware('auth')->group(function () {
+Route::prefix('manage')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
     Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
     Route::post('/blogs/store', [BlogController::class, 'store'])->name('blogs.store');
@@ -38,18 +44,58 @@ Route::prefix('manage')->middleware('auth')->group(function () {
         Route::get('/users/comments', [UserController::class, 'comments']);
         Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
     });
-
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
+    Route::get('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/register', [AuthController::class, 'createUser'])->name('register.user');
 });
+
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/manage/blogs');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('/', [BlogController::class, 'homepage'])->name('blogs.homepage');
 Route::get('/blogs/{id}', [BlogController::class, 'detail'])->name('blogs.detail');
 
+Route::get('/upload', function () {
+    return Storage::disk('public')->put('example1.txt', 'Contents');
+});
+
+Route::get('/file-uploaded', function () {
+    echo asset('storage/example1.txt');
+});
+
+Route::get('/send-email', function (Request $request) {
+    $users = User::limit(10)->get();
+
+    foreach ($users as $user) {
+        ProcessLoginMail::dispatch(
+            $user,
+            $request->ip(),
+            now()->toDateTimeString(),
+            $request->userAgent()
+        )->onQueue('send-login-notification');
+    }
+
+    return 'Sending Email Completed';
+});
 
 
 

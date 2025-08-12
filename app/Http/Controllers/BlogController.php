@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
@@ -39,6 +40,7 @@ class BlogController extends Controller
             'title' => 'required|unique:blogs|max:20',
             'description' => 'required',
             'status' => 'required',
+            'image' => 'image|mimes:png,jpg|max:2048'
         ]);
 
         if ($validated) {
@@ -53,11 +55,17 @@ class BlogController extends Controller
 
             // Eloquent ORM
             $auth = Auth::user();
+
+            if ($request->file("image")) {
+                $image = Storage::disk('public')->putFile('images', $request->file('image'));
+            }
+
             $blog = Blog::create([
                 'title' => $request->title,
                 'description' => $request->description,
                 'status' => $request->status,
                 'user_id' => $auth->id,
+                'image' => $image,
             ]);
 
             $blog->tags()->attach($request->tags);
@@ -103,7 +111,8 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255|unique:blogs,title,' . $id,
             'description' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'image' => 'image|mimes:png,jpg|max:2048'
         ]);
 
         if ($validated) {
@@ -126,11 +135,20 @@ class BlogController extends Controller
             //     abort(403);
             // }
 
+            if ($request->hasFile('image')) {
+                if ($blog->image && Storage::disk("public")->exists($blog->image)) {
+                    Storage::disk("public")->delete($blog->image);
+                }
+
+                $image = Storage::disk('public')->putFile('images', $request->file('image'));
+            }
+
             $blog->update([
                 'title' => $request->title,
                 'description' => $request->description,
                 'status' => $request->status,
                 'user_id' => $auth->id,
+                'image' => $image,
             ]);
             // $blog->tags()->detach($blog->tags);
             // $blog->tags()->attach($request->tags);

@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blogs Management System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> --}}
+    {{-- <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" /> --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 
 <body class="bg-gray-100">
@@ -23,7 +26,7 @@
             </ul>
         @endif --}}
 
-        <form action="{{ route('blogs.store') }}" method="POST" class="space-y-6">
+        <form action="{{ route('blogs.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <div>
                 <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
@@ -65,7 +68,22 @@
                     </div>
                 @enderror
             </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="image">Upload
+                    Image</label>
+                <input
+                    class="@error('image') border-red-300 @enderror block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none dark:bg-gray-700"
+                    id="image" type="file" name="image">
 
+                @error('image')
+                    <div class="mt-2 p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                        role="alert">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <!-- Tags -->
             <div>
                 <label for="status" class="block text-sm font-medium text-gray-700">Tags</label>
                 <ul
@@ -97,6 +115,7 @@
             </div>
         </form>
     </div>
+    <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
 </body>
 
 </html>

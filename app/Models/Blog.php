@@ -17,7 +17,8 @@ class Blog extends Model
         'title',
         'description',
         'status',
-        'user_id'
+        'user_id',
+        'image',
     ];
 
     public function user(): BelongsTo

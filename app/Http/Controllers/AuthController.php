@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Mail\LoginMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -22,12 +26,36 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            Mail::to($request->user())->send(new LoginMail($request->user(), $request->ip(), now()->toDateTimeLocalString(), $request->userAgent()));
+
             return redirect()->intended('manage/blogs');
         }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
+    }
+
+    public function register()
+    {
+        return view('auth.register');
+    }
+
+    public function createUser(Request $request)
+    {
+        $credentials = $request->validate([
+            'name' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $user = User::create($credentials);
+
+        Auth::login($user);
+
+        event(new Registered($user));
+
+        return redirect()->route('blogs.index');
     }
 
     public function logout(Request $request)
